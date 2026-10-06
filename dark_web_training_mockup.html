@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Black Market Ledger — Educational Simulation</title>
+<style>
+/* ============================================================
+   EDUCATIONAL DARK-WEB VISUAL SIMULATION
+   FICTIONAL / NON-FUNCTIONAL / NO REAL FINANCIAL SERVICE
+   ============================================================ */
+:root{
+  --bg:#070708;
+  --panel:#101012;
+  --panel2:#151518;
+  --line:#29292e;
+  --muted:#777780;
+  --text:#d7d7db;
+  --red:#b92828;
+  --red2:#7d1717;
+  --amber:#b58a39;
+  --green:#4d875b;
+  --cyan:#547c84;
+  --shadow:0 0 28px rgba(0,0,0,.75);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Consolas,Monaco,"Courier New",monospace}
+body{min-height:100vh;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+button{cursor:default}
+::selection{background:#722020;color:#fff}
+
+.noise{
+  position:fixed;inset:0;pointer-events:none;opacity:.07;z-index:99;
+  background-image:
+    repeating-linear-gradient(0deg,transparent 0 2px,rgba(255,255,255,.06) 3px),
+    repeating-linear-gradient(90deg,transparent 0 5px,rgba(255,0,0,.03) 6px);
+}
+.scanlines{
+  position:fixed;inset:0;pointer-events:none;z-index:98;opacity:.06;
+  background:repeating-linear-gradient(0deg,transparent 0 5px,#fff 6px);
+}
+.shell{max-width:1500px;margin:auto;padding:18px}
+.warning{
+  border:1px solid #7e2222;background:#170b0b;color:#d98d8d;
+  padding:10px 14px;font-size:12px;letter-spacing:.04em;
+  box-shadow:var(--shadow);margin-bottom:12px;
+}
+.warning strong{color:#f0a2a2}
+.topbar{
+  min-height:72px;border:1px solid var(--line);background:#0c0c0e;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;box-shadow:var(--shadow);gap:20px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.mark{
+  width:38px;height:38px;border:1px solid #743030;display:grid;place-items:center;
+  color:#d05a5a;background:#130a0a;font-weight:bold;
+}
+.brand h1{font-size:17px;margin:0;letter-spacing:.13em}
+.brand small{display:block;color:#626269;margin-top:4px;font-size:10px}
+.status{display:flex;align-items:center;gap:15px;color:#777;font-size:11px}
+.dot{width:7px;height:7px;border-radius:50%;background:#7c3131;box-shadow:0 0 9px #7c3131}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr) 290px;gap:12px;margin-top:12px}
+.panel{border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow)}
+.nav{padding:12px}
+.nav-title,.side-title{
+  color:#7b7b83;font-size:10px;letter-spacing:.15em;border-bottom:1px solid var(--line);
+  padding:7px 5px;margin-bottom:8px
+}
+.nav a{
+  display:block;padding:10px 8px;margin:3px 0;color:#9d9da4;border-left:2px solid transparent;
+  font-size:12px
+}
+.nav a:hover{background:#151518;border-left-color:var(--red)}
+.nav a.active{background:#171113;border-left-color:var(--red);color:#d7b4b4}
+.badge{float:right;border:1px solid #3b3b40;padding:1px 4px;color:#777}
+.main{padding:13px}
+.hero{
+  border:1px solid #3b2020;background:
+  linear-gradient(135deg,#130c0c 0%,#0e0e10 52%,#121010 100%);
+  padding:18px;position:relative;overflow:hidden;
+}
+.hero:after{
+  content:"EDUCATIONAL SIMULATION";
+  position:absolute;right:-35px;top:16px;transform:rotate(15deg);
+  border:1px solid #6b2828;color:#8d3939;padding:7px 35px;font-size:9px;
+  letter-spacing:.16em;background:#160b0b;
+}
+.hero h2{margin:0;color:#d3b1b1;font-size:23px;letter-spacing:.08em}
+.hero p{color:#77777f;font-size:11px;line-height:1.7;max-width:800px}
+.ticker{
+  margin-top:12px;border:1px solid var(--line);background:#09090a;
+  padding:8px;white-space:nowrap;overflow:hidden;color:#65656c;font-size:10px
+}
+.ticker span{margin-right:32px}
+.form-title{
+  margin-top:12px;padding:10px;border:1px solid var(--line);background:#0d0d0f;
+  color:#aaaab0;font-size:12px;letter-spacing:.1em
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.field{border:1px solid var(--line);background:#0c0c0e;padding:10px}
+.field.full{grid-column:1/-1}
+label{display:block;color:#72727a;font-size:9px;text-transform:uppercase;letter-spacing:.12em;margin-bottom:7px}
+input,select,textarea{
+  width:100%;border:1px solid #303035;background:#08080a;color:#bdbdc2;
+  outline:none;padding:10px;border-radius:0
+}
+input:focus,select:focus,textarea:focus{border-color:#633131}
+textarea{height:75px;resize:none}
+.fake-button{
+  border:1px solid #663131;background:#160c0c;color:#bb7777;padding:11px 14px;
+  display:inline-block;font-size:11px;letter-spacing:.08em
+}
+.fake-button.secondary{border-color:#35353a;background:#111114;color:#8b8b92}
+.action-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.disclaimer{
+  margin-top:10px;border:1px dashed #633131;background:#100909;padding:10px;
+  color:#9d6868;font-size:9px;line-height:1.7
+}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+.card{border:1px solid var(--line);background:#0d0d0f;padding:12px;min-height:110px}
+.card .k{font-size:9px;color:#65656b;text-transform:uppercase}
+.card .v{font-size:20px;margin-top:8px;color:#b9b9be}
+.card .s{font-size:9px;color:#55555b;margin-top:7px}
+.red{color:#a55757!important}.amber{color:#a58a52!important}.green{color:#5c8765!important}
+.table-wrap{margin-top:12px;border:1px solid var(--line);overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:10px;min-width:650px}
+th,td{padding:9px;border-bottom:1px solid #202025;text-align:left}
+th{background:#0b0b0d;color:#66666d;font-size:9px;text-transform:uppercase}
+td{color:#929299}
+.side{padding:12px}
+.sidebox{border:1px solid var(--line);background:#0c0c0e;margin-bottom:10px;padding:11px}
+.sidebox h3{font-size:10px;color:#8c8c93;margin:0 0 10px;letter-spacing:.1em}
+.metric{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dotted #242429;font-size:10px}
+.metric:last-child{border-bottom:0}
+.metric b{font-weight:normal;color:#aaaab0}
+.log{height:190px;overflow:hidden;font-size:9px;line-height:1.7;color:#57575e}
+.log .r{color:#8e4d4d}.log .g{color:#58705c}.log .a{color:#8d7748}
+.progress{height:6px;border:1px solid #29292e;background:#08080a;margin-top:7px}
+.progress i{display:block;height:100%;width:63%;background:#4c3030}
+.stamp{
+  margin-top:12px;border:2px solid #652d2d;color:#854040;padding:15px;
+  text-align:center;transform:rotate(-1deg);letter-spacing:.12em;font-size:13px
+}
+.footer{
+  margin-top:12px;border-top:1px solid var(--line);padding:13px 5px;
+  color:#4e4e55;font-size:9px;line-height:1.8
+}
+.glitch{position:relative}
+.glitch:before,.glitch:after{content:attr(data-text);position:absolute;left:0;top:0;opacity:.22}
+.glitch:before{transform:translate(1px,0);color:#a44}
+.glitch:after{transform:translate(-1px,0);color:#4b7777}
+@media(max-width:1100px){.layout{grid-template-columns:190px minmax(0,1fr)}.rightcol{grid-column:1/-1}.side{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sidebox{margin:0}}
+@media(max-width:760px){.shell{padding:8px}.layout{display:block}.nav{margin-bottom:10px}.nav a{display:inline-block;margin-right:4px}.form-grid,.cards{grid-template-columns:1fr}.field.full{grid-column:auto}.rightcol{margin-top:10px}.side{display:block}.sidebox{margin-bottom:10px}.topbar{align-items:flex-start}.status{display:none}}
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="scanlines"></div>
+
+<div class="shell">
+  <div class="warning">
+    <strong>TRAINING SIMULATION — FICTIONAL INTERFACE.</strong>
+    This page is a visual study of illicit-market aesthetics. It is not a bank,
+    does not create accounts, does not process payments, and must not be used for real-world transactions.
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">BL</div>
+      <div>
+        <h1 class="glitch" data-text="BLACK LEDGER // ARCHIVE">BLACK LEDGER // ARCHIVE</h1>
+        <small>FICTIONAL UNDERGROUND FINANCIAL INTERFACE / TRAINING BUILD 0.0.7</small>
+      </div>
+    </div>
+    <div class="status">
+      <span><i class="dot"></i> SIMULATION MODE</span>
+      <span>NODE: EDU-LOCAL</span>
+      <span>UTC 03:17:44</span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="panel nav">
+      <div class="nav-title">ARCHIVE INDEX</div>
+      <a class="active" href="#">01 / OPEN CASE <span class="badge">EDU</span></a>
+      <a href="#">02 / LEDGER VIEW <span class="badge">12</span></a>
+      <a href="#">03 / MESSAGE CACHE <span class="badge">04</span></a>
+      <a href="#">04 / MARKET NOISE <span class="badge">37</span></a>
+      <a href="#">05 / ID ARCHIVE <span class="badge">SIM</span></a>
+      <a href="#">06 / SYSTEM LOG <span class="badge">ON</span></a>
+      <div class="nav-title" style="margin-top:16px">TRAINING MODULES</div>
+      <a href="#">Anonymity myths</a>
+      <a href="#">Scam indicators</a>
+      <a href="#">Interface deception</a>
+      <a href="#">Threat modeling</a>
+      <a href="#">Digital hygiene</a>
+      <div class="nav-title" style="margin-top:16px">NOTICE</div>
+      <p style="font-size:9px;color:#55555b;line-height:1.8;padding:5px">
+        All names, balances, identifiers, addresses and records shown here are
+        synthetic placeholders created for classroom visualization.
+      </p>
+    </aside>
+
+    <main class="panel main">
+      <section class="hero">
+        <h2>ACCOUNT INTAKE / SUBJECT REGISTRATION</h2>
+        <p>
+          A deliberately chaotic mock interface demonstrating how suspicious
+          financial portals may create an atmosphere of urgency, secrecy,
+          authority and false legitimacy. No field below connects to a server.
+        </p>
+        <div class="ticker">
+          <span>[SIM] archive mirror synchronized</span>
+          <span>[EDU] no network submission</span>
+          <span>[WARN] synthetic records only</span>
+          <span>[LOCAL] transaction engine disabled</span>
+          <span>[LAB] visual-analysis mode</span>
+        </div>
+      </section>
+
+      <div class="cards">
+        <div class="card"><div class="k">Mock Ledger Entries</div><div class="v">8,431</div><div class="s">STATIC DISPLAY VALUE</div></div>
+        <div class="card"><div class="k">Pending Cases</div><div class="v red">117</div><div class="s">NO REAL CASES EXIST</div></div>
+        <div class="card"><div class="k">Network State</div><div class="v green">OFFLINE</div><div class="s">BROWSER-ONLY DEMO</div></div>
+      </div>
+
+      <div class="form-title">/// NEW TRAINING CASE — VISUAL FORM ONLY ///</div>
+      <form onsubmit="return false">
+        <div class="form-grid">
+          <div class="field full">
+            <label>Target Name / Training Subject Name</label>
+            <input type="text" placeholder="Enter a fictional training subject name" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Case Alias</label>
+            <input type="text" placeholder="e.g. SUBJECT-047" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Classification</label>
+            <select>
+              <option>EDUCATIONAL SAMPLE</option>
+              <option>FICTIONAL PERSONA</option>
+              <option>INTERFACE STUDY</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Mock Account Tier</label>
+            <select>
+              <option>ARCHIVE / ZERO VALUE</option>
+              <option>RESEARCH / ZERO VALUE</option>
+              <option>DEMO / ZERO VALUE</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Risk Label</label>
+            <select>
+              <option>UNKNOWN — SIMULATION</option>
+              <option>LOW — SYNTHETIC</option>
+              <option>HIGH — VISUAL FLAG ONLY</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label>Analyst Notes</label>
+            <textarea placeholder="Write observations about the interface, deception cues, or security lessons..."></textarea>
+          </div>
+        </div>
+        <div class="action-row">
+          <span class="fake-button">CREATE MOCK CASE</span>
+          <span class="fake-button secondary">CLEAR VISUAL FORM</span>
+          <span class="fake-button secondary">EXPORT DISABLED</span>
+        </div>
+      </form>
+
+      <div class="disclaimer">
+        <strong>ANTI-FRAUD TRAINING NOTICE:</strong>
+        The apparent “account creation” controls above are deliberately inert.
+        They exist only to demonstrate visual persuasion techniques such as
+        fake urgency, artificial scarcity, intimidating system language and
+        suspicious ledger presentation. Do not enter real personal, financial,
+        login or identification information into this demonstration.
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Case</th><th>Alias</th><th>State</th><th>Last Event</th><th>Risk</th><th>Value</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>SIM-001</td><td>ORCHID-77</td><td class="green">ARCHIVED</td><td>03:01:12</td><td class="amber">REVIEW</td><td>0.00</td></tr>
+            <tr><td>SIM-002</td><td>GREYFOX-19</td><td>HOLD</td><td>02:58:40</td><td class="red">FLAGGED</td><td>0.00</td></tr>
+            <tr><td>SIM-003</td><td>NIGHTBUS-4</td><td class="green">ARCHIVED</td><td>02:51:09</td><td>NONE</td><td>0.00</td></tr>
+            <tr><td>SIM-004</td><td>NULL-ENTITY</td><td class="amber">PENDING</td><td>02:44:31</td><td class="red">UNKNOWN</td><td>0.00</td></tr>
+            <tr><td>SIM-005</td><td>GLASS-ROOM</td><td>HOLD</td><td>02:37:15</td><td class="amber">REVIEW</td><td>0.00</td></tr>
+            <tr><td>SIM-006</td><td>STATIC-21</td><td class="green">ARCHIVED</td><td>02:31:06</td><td>NONE</td><td>0.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <aside class="panel rightcol">
+      <div class="side">
+        <div class="sidebox">
+          <h3>SIMULATION HEALTH</h3>
+          <div class="metric"><span>Database</span><b class="green">NOT CONNECTED</b></div>
+          <div class="metric"><span>Payments</span><b>DISABLED</b></div>
+          <div class="metric"><span>Identity</span><b>FAKE DATA</b></div>
+          <div class="metric"><span>Network</span><b>LOCAL</b></div>
+          <div class="metric"><span>Submission</span><b>BLOCKED</b></div>
+        </div>
+        <div class="sidebox">
+          <h3>THREAT METER / VISUAL</h3>
+          <div style="font-size:9px;color:#5e5e65">ATMOSPHERE INTENSITY</div>
+          <div class="progress"><i></i></div>
+          <div style="margin-top:8px;font-size:10px;color:#9b5959">63% CHAOTIC AESTHETIC</div>
+        </div>
+        <div class="sidebox">
+          <h3>RECENT SYSTEM MESSAGES</h3>
+          <div class="log">
+            <div class="r">03:17:44 / [SIM] fake node heartbeat</div>
+            <div>03:17:31 / archive index refreshed</div>
+            <div class="a">03:16:55 / visual flag raised</div>
+            <div>03:16:21 / synthetic record loaded</div>
+            <div class="g">03:15:48 / no network connection</div>
+            <div>03:14:09 / training banner verified</div>
+            <div class="r">03:13:50 / suspicious UI pattern</div>
+            <div>03:12:17 / local cache unchanged</div>
+            <div class="a">03:11:04 / observer mode enabled</div>
+            <div>03:09:43 / mock ledger indexed</div>
+          </div>
+        </div>
+        <div class="sidebox">
+          <h3>CLASSROOM CHECKLIST</h3>
+          <div class="metric"><span>Urgency language</span><b>✓</b></div>
+          <div class="metric"><span>Fake authority</span><b>✓</b></div>
+          <div class="metric"><span>Dark pattern</span><b>✓</b></div>
+          <div class="metric"><span>Real backend</span><b class="green">NO</b></div>
+          <div class="metric"><span>Real money</span><b class="green">NO</b></div>
+        </div>
+        <div class="stamp">FICTIONAL<br>EDUCATIONAL USE</div>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="footer">
+    BLACK LEDGER // ARCHIVE — VISUAL SECURITY EDUCATION DEMO<br>
+    This artifact intentionally imitates the visual language of fictional underground financial interfaces.
+    It contains no authentication system, no account database, no transaction engine, no payment gateway,
+    no cryptocurrency wallet, no real-world identity verification and no hidden network service.<br>
+    For classroom demonstrations, UI analysis, cybersecurity awareness and dark-pattern research only.
+  </footer>
+</div>
+
+<script>
+/*
+  Deliberately minimal script.
+  This simulation is intentionally non-functional.
+  It only provides harmless visual effects and never transmits form data.
+*/
+(function(){
+  const ticker = document.querySelector('.ticker');
+  const messages = [
+    '[SIM] archive mirror synchronized',
+    '[EDU] no network submission',
+    '[WARN] synthetic records only',
+    '[LOCAL] transaction engine disabled',
+    '[LAB] visual-analysis mode'
+  ];
+  let offset = 0;
+  setInterval(function(){
+    offset = (offset + 1) % messages.length;
+    const spans = ticker.querySelectorAll('span');
+    if(spans.length){
+      spans[0].textContent = messages[offset];
+    }
+  }, 2600);
+
+  document.querySelectorAll('form input, form textarea, form select').forEach(function(el){
+    el.addEventListener('change', function(){
+      /* No data leaves the page. */
+      console.debug('TRAINING SIMULATION: local field changed');
+    });
+  });
+})();
+</script>
+
+<!-- VISUAL REFERENCE BLOCKS FOR EDUCATIONAL SOURCE REVIEW -->
+<!--
+REFERENCE-001: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-002: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-003: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-004: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-005: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-006: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-007: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-008: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-009: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-010: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-011: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-012: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-013: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-014: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-015: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-016: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-017: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-018: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-019: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-020: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-021: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-022: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-023: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-024: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-025: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-026: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-027: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-028: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-029: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-030: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-031: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-032: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-033: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-034: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-035: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-036: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-037: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-038: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-039: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-040: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-041: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-042: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-043: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-044: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-045: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-046: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-047: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-048: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-049: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-050: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-051: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-052: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-053: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-054: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-055: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-056: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-057: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-058: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-059: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-060: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-061: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-062: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-063: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-064: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-065: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-066: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-067: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-068: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-069: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-070: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-071: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-072: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-073: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-074: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-075: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-076: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-077: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-078: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-079: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-080: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-081: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-082: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-083: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-084: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-085: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-086: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-087: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-088: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-089: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-090: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-091: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-092: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-093: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-094: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-095: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-096: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-097: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-098: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-099: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-100: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-101: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-102: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-103: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-104: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-105: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-106: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-107: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-108: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-109: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-110: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-111: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-112: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-113: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-114: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-115: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-116: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-117: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-118: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-119: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-120: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-121: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-122: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-123: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-124: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-125: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-126: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-127: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-128: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-129: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-130: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-131: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-132: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-133: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-134: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-135: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-136: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-137: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-138: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-139: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-140: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-141: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-142: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-143: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-144: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-145: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-146: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-147: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-148: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-149: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-150: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-151: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-152: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-153: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-154: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-155: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-156: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-157: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-158: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-159: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-160: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-161: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-162: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-163: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-164: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-165: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-166: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-167: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-168: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-169: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-170: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-171: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-172: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-173: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-174: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-175: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-176: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-177: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-178: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-179: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-180: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-181: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-182: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-183: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-184: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-185: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-186: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-187: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-188: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-189: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-190: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-191: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-192: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-193: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-194: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-195: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-196: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-197: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-198: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-199: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-200: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-201: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-202: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-203: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-204: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-205: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-206: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-207: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-208: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-209: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-210: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-211: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-212: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-213: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-214: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-215: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-216: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-217: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-218: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+<!--
+REFERENCE-219: This source block represents a fictional UI observation.
+It contains no operational credential, endpoint, payment instruction, or real identity data.
+Researchers can use browser developer tools to inspect spacing, typography, borders,
+warning labels, hierarchy, and dark-pattern presentation in a controlled environment.
+-->
+</body>
+</html>
